@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: FACT_TABLE
+    description: One record per customer
+    columns:
+      - name: ProductKey
+        description: Primary key
+        tests:
+          - not_null
+      - name: ResellerKey
+        description: NULL when a customer has not yet placed an order.
+        tests:
+          - not_null
+
+  - name: stg_FACTRESELLERSALES
+    columns:
+      - name: ProductKey
+        description: Primary key
+        tests:
+          - not_null
+      - name: ResellerKey
+        description: NULL when a customer has not yet placed an order.
+        tests:
+          - not_null
+
+  - name: stg_DIMRESELLER
+    columns:
+      - name: ResellerKey
+        tests:
+          - unique
+          - relationships:
+              to: ref('stg_FACTRESELLERSALES')
+              field: ResellerKey
+      - name: GeographyKey
+        description: NULL when a customer has not yet placed an order.
+        tests:
+          - not_null
+              
+
+  - name: stg_DIMPRODUCT
+    columns:
+      - name: ProductKey
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_FACTRESELLERSALES')
+              field: ProductKey
+
+  - name: stg_DIMGEOGRAPHY
+    columns:
+      - name: GeographyKey
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_DIMRESELLER')
+              field: GeographyKey
+
+  - name: stg_DIMCUSTOMER
+    columns:
+      - name: GeographyKey
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_DIMRESELLER')
+              field: GeographyKey
+      - name: CustomerKey
+        description: NULL when a customer has not yet placed an order.
+        tests:
+          - not_null
